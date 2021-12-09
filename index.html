@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <style>
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart" width="200" height="200"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js">
+    </script>
+<script>
+let ctx = document.getElementById('myChart').getContext('2d');
+let myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: Cookies.get('labels').slice(3, -1).split(',').map(element => element.slice(1, -1)).map(element => parseFloat(element)),
+        datasets: [{
+            label: 'Симметричная трапецивидная функция',
+            data: Cookies.get('data').slice(3, -1).split(',').map(element => parseFloat(element)),
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    }
+});
+
+myChart.scale(512, 512);
+
+</script>
+</body>
+</html>

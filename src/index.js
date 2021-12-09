@@ -2,12 +2,14 @@
 /*                 Ctrl + S - перезапуск программы                           */
 
 // Импортирую express - для создания локального сервера;
-import express from 'express';
+import express, { Router } from 'express';
 // Импортирую ADODB - это библиотека для работы с Access базами данных;
 import ADODB from 'node-adodb';
 
+
 // Записываю в app функцию express();
 const app = express();
+const router = Router();
 // Подключаю базу данных из файла Source=<name>.mdb, файл находится в папке проекта;
 const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=jumise.mdb;');
 // Инициализирую пустой массив, в который буду заносить записи удовлетворяющие условию запроса;
@@ -33,14 +35,29 @@ async function search(query, b, c, d) {
             // В записи data[i].<name> - необходимо указать название аттрибута, по которому происходит поиск;
             if(tmf(data[i].Стаж, b, c, d) > 0) {
                 // В записи data[i].<name> - необходимо указать название аттрибута, по которому происходит поиск;
-                data[i].tmf = tmf(data[i].Стаж, 12, 18, 6);
+                data[i].tmf = tmf(data[i].Стаж, b, c, d);
                 result.push(data[i]);
             };
         }
     });
 
+    let labels = [];
+    for (let j = 0; j < c*2; j++) {
+      await labels.push(j.toString());
+    };
+
+    let func = [];
+    for (let k = 0; k < labels.length; k++) {
+      func.push(await tmf(k, b, c, d));
+    }
+    
+    const returned = {
+      labels: labels,
+      data: func,
+      result: result.sortBy('tmf')
+    }
     // Сортирую массив по полю tmf в объектах с помощью ранее описанной функции;
-    return result.sortBy('tmf');
+    return returned;
 };
 
 // Инициализируем наш запрос, сюда вписываем любой SQL запрос;
@@ -50,11 +67,16 @@ const query = 'SELECT * FROM Сотрудники';
 // 1 - SQL Запрос;
 // 2, 3 - Ограничения функции;
 // 4 - Шаг гибкости;
-const final = await search(query, 12, 18, 2);
+let final = await search(query, 14, 16, 6);
 
-// Выводим результат в консоль;
-console.log(final);
+console.log(final.result);
 
-// Поле tmf в объекте - степень удовлетворения условию запроса; 1 - максимум;
+router.get('/', (req, res) => {
+  res.cookie('labels', final.labels, { path: '/' });
+  res.cookie('data', final.data, { path: '/' });
+  res.sendFile('index.html', { root: '.' });
+})
+
+app.use(router);
 
 app.listen(4000);
