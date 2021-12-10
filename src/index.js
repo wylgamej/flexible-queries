@@ -67,13 +67,14 @@ const query = 'SELECT * FROM Сотрудники';
 // 1 - SQL Запрос;
 // 2, 3 - Ограничения функции;
 // 4 - Шаг гибкости;
-let final = await search(query, 14, 16, 6);
+let final = await search(query, 0, 10, 1);
 
 console.log(final.result);
 
 router.get('/', (req, res) => {
   res.cookie('labels', final.labels, { path: '/' });
   res.cookie('data', final.data, { path: '/' });
+  res.cookie('workers', final.result, { path: '/'});
   res.sendFile('index.html', { root: '.' });
 })
 

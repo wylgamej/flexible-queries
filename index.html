@@ -12,22 +12,45 @@
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js">
     </script>
 <script>
+let worker = JSON.parse(Cookies.get('workers').slice(2));
+let worker_bouble = [];
+function r() { return Math.floor(Math.random() * 255) }
+let dataset = [
+    {
+        type: 'line',
+        label: 'Симметричная трапецивидная функция',
+        data: Cookies.get('data').slice(3, -1).split(',').map(element => parseFloat(element)),
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.2)'
+        ],
+        borderColor: [
+            'rgba(255, 99, 132, 1)'
+        ],
+        borderWidth: 1
+    }
+];
+
+worker.map(element => {
+    let obj = {
+        type: 'bubble',
+            label: element['Фамилия'],
+            data: [
+                {
+                    'x': element['Стаж'],
+                    'y': element['tmf'],
+                    'r': 8,
+                }
+            ],
+            backgroundColor: 'rgb(' + r() + "," + r() + "," + r() + ')'
+    };
+
+    dataset.push(obj);
+})
 let ctx = document.getElementById('myChart').getContext('2d');
 let myChart = new Chart(ctx, {
-    type: 'line',
     data: {
+        datasets: dataset,
         labels: Cookies.get('labels').slice(3, -1).split(',').map(element => element.slice(1, -1)).map(element => parseFloat(element)),
-        datasets: [{
-            label: 'Симметричная трапецивидная функция',
-            data: Cookies.get('data').slice(3, -1).split(',').map(element => parseFloat(element)),
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)'
-            ],
-            borderWidth: 1
-        }]
     }
 });
 
